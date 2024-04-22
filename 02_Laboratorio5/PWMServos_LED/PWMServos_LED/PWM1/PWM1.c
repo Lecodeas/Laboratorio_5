@@ -3,10 +3,10 @@
  IE2023: Programacion de Microcontroladores
  PWM1.c
  Autor: Ian Anleu Rivera
- Proyecto: Prelab 5
+ Proyecto: Lab 5
  Hardware: ATMEGA328P
  Creado: 14/04/2024
- Ultima modificacion: 14/04/2024
+ Ultima modificacion: 17/04/2024
     -----------------------------------------------
 */
 
@@ -59,7 +59,7 @@ static void actualizar_pwm(uint16_t i, uint8_t NumServo){
 	}
 }
 
-void actualizar_servo(uint16_t adchleido, uint8_t servo_a_modificar){
+void actualizar_servo(uint8_t adchleido, uint8_t servo_a_modificar){
 	//Conversión de lectura de ADC a pulso en PWM
 	float razon = (float)adchleido/(float)256;
 	razon = (((float)SERVOMAX - (float)SERVOMIN)*razon) + (float)SERVOMIN;

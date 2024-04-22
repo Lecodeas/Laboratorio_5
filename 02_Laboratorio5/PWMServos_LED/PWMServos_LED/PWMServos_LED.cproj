@@ -142,8 +142,15 @@
     <Compile Include="PWM1\PWM1.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="PWManual\PWManual.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PWManual\PWManual.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PWManual" />
     <Folder Include="PWM1\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

@@ -17,12 +17,13 @@
 #include <stdint.h> //Lib para enteros
 #include <avr/interrupt.h> //Lib para interrupciones
 #include "PWM1/PWM1.h" //PWM1
+#include "PWManual/PWManual.h" //TIMER2
 
 //VARIABLES GLOBALES
 //Otras variables
 uint8_t servo = 0;
 uint8_t valoradc = 0;
-uint8_t servo_a_modificar = 1;
+uint8_t modificar_secuencial = 1;
 
 //PROTOTIPOS DE FUNCIÓN
 void setup(void);
@@ -34,18 +35,26 @@ void setupADC(void);
 ISR(ADC_vect){
 	valoradc = ADCH; // Almacenar valor
 	ADCSRA |= (1<<ADIF); // Apagar bandera
-	if (servo_a_modificar == 1){
-		servo_a_modificar = 2;
+	if (modificar_secuencial == 1){
+		modificar_secuencial = 2;
 		//Remux ADC6
 		ADMUX = 0; //Limpiar multiplexado
 		ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1); //Vcc ref | Just. Izq. | Mux ADC6	
 	}
 	else
 	{
-		servo_a_modificar = 1;
-		//Remux ADC7
-		ADMUX = 0; //Limpiar multiplexado
-		ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0); //Vcc ref | Just. Izq. | Mux ADC7
+		if (modificar_secuencial == 2){
+			modificar_secuencial = 3;
+			//Remux ADC7
+			ADMUX = 0; //Limpiar multiplexado
+			ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0); //Vcc ref | Just. Izq. | Mux ADC7
+		}
+		else{
+			modificar_secuencial = 1;
+			//Remux ADC5
+			ADMUX = 0; //Limpiar multiplexado
+			ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX0); //Vcc ref | Just. Izq. | Mux ADC5
+		}
 	}
 }
 
@@ -56,6 +65,7 @@ int main(void)
 	setup();
 	setupADC();
 	setupPWM1();
+	setupTIMER2();
 	sei();
 	
 	actualizar_servo(0,1); //Primer inicio de Servo1
@@ -64,11 +74,14 @@ int main(void)
 
 	while (1)
 	{
-		_delay_ms(10);
+		_delay_ms(25);
 		actualizar_servo(valoradc, 1);
 		ADCSRA |= (1<<ADSC); //Volver a iniciar
-		_delay_ms(10);
+		_delay_ms(25);
 		actualizar_servo(valoradc, 2);
+		ADCSRA |= (1<<ADSC); //Volver a iniciar
+		_delay_ms(25);
+		actualizar_counterlimit(valoradc);
 		ADCSRA |= (1<<ADSC); //Volver a iniciar
 	}// Fin Main Loop
 }
@@ -81,12 +94,18 @@ void setup(void){
 	
 	//Salidas
 	//PB1 va al Servo 1 (OC1A)
+	//PB2 va al Servo 2 (OC1B)
 	DDRB = 0;
 	DDRB |= (1<<DDB2)|(1<<DDB1);
-	//Otros servos
+	
+	//PD6 va a LED (TIMER2)
+	DDRD = 0;
+	DDRD |= (1<<DDD6);
 }
 
 void setupADC(void){
+	DIDR0 = 0;
+	DIDR0 = (1<<ADC5D); //Digital disable PC5
 	ADMUX = 0;
 	ADMUX |= (1<<REFS0)|(1<<ADLAR)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0); //Vcc ref | Just. Izq. | Mux ADC7
 	ADCSRA = 0;

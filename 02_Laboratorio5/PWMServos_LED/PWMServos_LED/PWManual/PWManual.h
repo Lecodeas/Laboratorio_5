@@ -1,29 +1,26 @@
 /* -----------------------------------------------
  Universidad del Valle de Guatemala
  IE2023: Programacion de Microcontroladores
- PWM1.h
+ PWManual.h
  Autor: Ian Anleu Rivera
  Proyecto: Lab 5
  Hardware: ATMEGA328P
- Creado: 14/04/2024
+ Creado: 17/04/2024
  Ultima modificacion: 17/04/2024
     -----------------------------------------------
 */
 
 
-#ifndef PWM1_H_
-#define PWM1_H_
+#ifndef PWMANUAL_H_
+#define PWMANUAL_H_
 
 #include <avr/io.h> //IO registros
 #include <stdint.h> //Lib para enteros
 #include <avr/interrupt.h> //Lib para interrupciones
 
-//Constantes
-#define PWMTOP 39999 
-#define SERVOMAX 3999
-#define SERVOMIN 1999
+#define TIMERLIMIT 255 //.064 ms en tempo mode
 
-void setupPWM1(void);
-void actualizar_servo(uint8_t adchleido, uint8_t servo_a_modificar);
+void setupTIMER2(void);
+void actualizar_counterlimit(uint8_t limiteadch);
 
-#endif /* PWM1_H_ */
+#endif /* PWMANUAL_H_ */
